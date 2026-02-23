@@ -1,5 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { agentManager } from '../agents/manager';
+import { getModelsBySdk } from '@nexus/adapters';
 import * as queries from '../db/queries';
 import type { AgentConfig, AgentSDK } from '@nexus/shared';
 
@@ -72,5 +73,15 @@ export async function agentRoutes(fastify: FastifyInstance): Promise<void> {
     }
     const models = await adapter.getAvailableModels();
     return { models };
+  });
+
+  fastify.get<{ Params: { sdk: string } }>('/models/:sdk', async (req, reply) => {
+    const sdk = req.params.sdk as AgentSDK;
+    const validSdks: AgentSDK[] = ['claude', 'codex', 'opencode'];
+    if (!validSdks.includes(sdk)) {
+      return reply.status(400).send({ error: `유효하지 않은 SDK: ${sdk}` });
+    }
+    const models = await getModelsBySdk(sdk);
+    return { sdk, models };
   });
 }

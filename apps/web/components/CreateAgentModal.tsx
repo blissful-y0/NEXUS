@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNexusStore } from '@/store/agents';
 import type { AgentSDK } from '@nexus/shared';
 
@@ -14,26 +14,44 @@ const SDK_OPTIONS: { value: AgentSDK; label: string; color: string }[] = [
   { value: 'opencode', label: 'OpenCode', color: 'bg-blue-500' },
 ];
 
-const MODEL_OPTIONS: Record<AgentSDK, string[]> = {
-  claude: ['claude-sonnet-4-20250514', 'claude-opus-4-20250514', 'claude-3-5-haiku-20241022'],
-  codex: ['o4-mini', 'o3', 'gpt-4.1', 'gpt-4.1-mini'],
-  opencode: ['claude-sonnet-4-20250514', 'gpt-4.1'],
-};
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export function CreateAgentModal({ onClose }: Props) {
   const { addAgent } = useNexusStore();
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
   const [sdk, setSdk] = useState<AgentSDK>('claude');
-  const [model, setModel] = useState(MODEL_OPTIONS.claude[0]);
+  const [models, setModels] = useState<string[]>([]);
+  const [model, setModel] = useState('');
+  const [modelsLoading, setModelsLoading] = useState(false);
   const [isOrchestrator, setIsOrchestrator] = useState(false);
   const [systemPrompt, setSystemPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    const fetchModels = async () => {
+      setModelsLoading(true);
+      setModels([]);
+      setModel('');
+      try {
+        const res = await fetch(`${API_URL}/models/${sdk}`);
+        if (res.ok) {
+          const data = await res.json();
+          setModels(data.models);
+          setModel(data.models[0] ?? '');
+        }
+      } catch {
+        // 서버 미응답 시 폴백 없음
+      } finally {
+        setModelsLoading(false);
+      }
+    };
+    fetchModels();
+  }, [sdk]);
+
   const handleSdkChange = (newSdk: AgentSDK) => {
     setSdk(newSdk);
-    setModel(MODEL_OPTIONS[newSdk][0]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -124,13 +142,20 @@ export function CreateAgentModal({ onClose }: Props) {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">모델</label>
+            <label className="block text-sm text-gray-400 mb-1">
+              모델
+              {modelsLoading && <span className="ml-2 text-xs text-gray-500">불러오는 중...</span>}
+            </label>
             <select
               value={model}
               onChange={e => setModel(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 text-sm"
+              disabled={modelsLoading || models.length === 0}
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 text-sm disabled:opacity-50"
             >
-              {MODEL_OPTIONS[sdk].map(m => (
+              {models.length === 0 && !modelsLoading && (
+                <option value="">모델을 불러올 수 없습니다</option>
+              )}
+              {models.map(m => (
                 <option key={m} value={m}>{m}</option>
               ))}
             </select>
@@ -171,7 +196,7 @@ export function CreateAgentModal({ onClose }: Props) {
             </button>
             <button
               type="submit"
-              disabled={loading || !name.trim() || !role.trim()}
+              disabled={loading || !name.trim() || !role.trim() || !model}
               className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-medium"
             >
               {loading ? '생성 중...' : '생성'}

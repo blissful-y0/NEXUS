@@ -23,3 +23,8 @@ export function createAdapter(sdk: AgentSDK, config: AdapterConfig): AgentAdapte
       throw new Error(`Unknown SDK: ${sdk}`);
   }
 }
+
+export async function getModelsBySdk(sdk: AgentSDK): Promise<string[]> {
+  const adapter = createAdapter(sdk, { model: '' });
+  return adapter.getAvailableModels();
+}
