@@ -3,7 +3,11 @@
 import { useNexusStore } from '@/store/agents';
 import { useEffect } from 'react';
 
-export function Header() {
+interface HeaderProps {
+  onCreateAgent?: () => void;
+}
+
+export function Header({ onCreateAgent }: HeaderProps) {
   const {
     budget,
     agents,
@@ -46,16 +50,16 @@ export function Header() {
             'bg-red-500'
           }`} />
           <span className="text-xs text-gray-400">
-            {connectionStatus === 'connected' ? 'Connected' :
-             connectionStatus === 'connecting' ? 'Connecting...' :
-             'Disconnected'}
+            {connectionStatus === 'connected' ? '연결됨' :
+             connectionStatus === 'connecting' ? '연결 중...' :
+             '연결 끊김'}
           </span>
         </div>
       </div>
 
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-4">
         <div className="text-sm">
-          <span className="text-gray-400">Active:</span>{' '}
+          <span className="text-gray-400">활성:</span>{' '}
           <span className="text-white font-medium">{activeAgents}</span>
           <span className="text-gray-500"> / {agents.length}</span>
         </div>
@@ -87,8 +91,17 @@ export function Header() {
               : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
           }`}
         >
-          {isAutoMode ? 'Auto' : 'Manual'}
+          {isAutoMode ? '자동' : '수동'}
         </button>
+
+        {onCreateAgent && (
+          <button
+            onClick={onCreateAgent}
+            className="px-3 py-1 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition"
+          >
+            + 에이전트 추가
+          </button>
+        )}
       </div>
     </header>
   );

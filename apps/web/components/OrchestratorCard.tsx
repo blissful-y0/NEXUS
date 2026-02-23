@@ -16,6 +16,15 @@ const statusColors: Record<string, string> = {
   terminated: 'bg-gray-700',
 };
 
+const statusLabels: Record<string, string> = {
+  idle: '대기',
+  running: '실행 중',
+  paused: '일시정지',
+  completed: '완료',
+  error: '오류',
+  terminated: '종료',
+};
+
 export function OrchestratorCard({ agent }: Props) {
   const { selectAgent, selectedAgentId } = useNexusStore();
   const isSelected = selectedAgentId === agent.id;
@@ -40,7 +49,7 @@ export function OrchestratorCard({ agent }: Props) {
 
         <div className="flex items-center gap-2">
           <span className={`w-3 h-3 rounded-full ${statusColors[agent.status]}`} />
-          <span className="text-sm text-gray-300 capitalize">{agent.status}</span>
+          <span className="text-sm text-gray-300">{statusLabels[agent.status] ?? agent.status}</span>
         </div>
       </div>
 
@@ -50,14 +59,14 @@ export function OrchestratorCard({ agent }: Props) {
           <span className="text-white font-medium">{agent.sdk}</span>
         </div>
         <div>
-          <span className="text-gray-400">Model:</span>{' '}
+          <span className="text-gray-400">모델:</span>{' '}
           <span className="text-white font-medium">{agent.model.split('/').pop()}</span>
         </div>
       </div>
 
       {agent.currentTask && (
         <div className="mt-4 p-3 bg-black/30 rounded-lg">
-          <p className="text-xs text-gray-400">Current Task:</p>
+          <p className="text-xs text-gray-400">현재 작업:</p>
           <p className="text-sm text-white truncate">{agent.currentTask}</p>
         </div>
       )}

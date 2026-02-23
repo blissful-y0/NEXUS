@@ -42,7 +42,7 @@ export function TaskInput() {
           onChange={(e) => setSelectedAgentId(e.target.value)}
           className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
         >
-          <option value="">Select Agent...</option>
+          <option value="">에이전트 선택...</option>
           {availableAgents.map(agent => (
             <option key={agent.id} value={agent.id}>
               {agent.name} ({agent.sdk})
@@ -55,7 +55,7 @@ export function TaskInput() {
         type="text"
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
-        placeholder={isAutoMode ? "Describe your task..." : "Enter prompt for agent..."}
+        placeholder={isAutoMode ? "오케스트레이터에게 목표를 입력하세요..." : "에이전트에게 전달할 프롬프트를 입력하세요..."}
         className="flex-1 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
       />
 
@@ -64,7 +64,7 @@ export function TaskInput() {
         disabled={!isConnected || !prompt.trim() || (!isAutoMode && !selectedAgentId)}
         className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
       >
-        Send
+        전송
       </button>
     </form>
   );

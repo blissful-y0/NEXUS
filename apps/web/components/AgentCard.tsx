@@ -22,6 +22,15 @@ const statusColors: Record<string, string> = {
   terminated: 'bg-gray-700',
 };
 
+const statusLabels: Record<string, string> = {
+  idle: '대기',
+  running: '실행 중',
+  paused: '일시정지',
+  completed: '완료',
+  error: '오류',
+  terminated: '종료',
+};
+
 export function AgentCard({ agent }: Props) {
   const { selectAgent, selectedAgentId } = useNexusStore();
   const isSelected = selectedAgentId === agent.id;
@@ -45,7 +54,7 @@ export function AgentCard({ agent }: Props) {
 
         <div className="flex items-center gap-1.5">
           <span className={`w-2 h-2 rounded-full ${statusColors[agent.status]}`} />
-          <span className="text-xs text-gray-400 capitalize">{agent.status}</span>
+          <span className="text-xs text-gray-400">{statusLabels[agent.status] ?? agent.status}</span>
         </div>
       </div>
 
