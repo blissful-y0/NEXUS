@@ -67,7 +67,7 @@ export class CodexAdapter implements AgentAdapter {
       cwd: this.config.workingDirectory || process.cwd(),
       env: {
         ...process.env,
-        OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+        ...(process.env.OPENAI_API_KEY ? { OPENAI_API_KEY: process.env.OPENAI_API_KEY } : {}),
       },
     });
 
